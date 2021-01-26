@@ -20,30 +20,6 @@ public class SqlConverter {
 		this.server = server;
 	}
 	
-	public ArrayList<String> getAllFoodNames() {
-		ArrayList<String> food = new ArrayList<String>();
-		ResultSet resultSet = null;
-		try (Connection connection = DriverManager.getConnection(getConnectionInfo());
-            Statement statement = connection.createStatement();) {
-            resultSet = statement.executeQuery(generateSelectAllCommand());
-            while (resultSet.next()) {
-            	food.add(resultSet.getString(1));
-            }
-            return food;
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-            return food;
-        }
-	}
-	
-	public void printAllFoodNames() {		
-		ArrayList<String> food = getAllFoodNames();
-		for (int i = 0; i < food.size(); i++) {
-			System.out.println(food.get(i));
-		}
-	}
-	
 	private String getConnectionInfo() {
 		return "jdbc:sqlserver://"
 				+ server.getIp()
@@ -113,5 +89,33 @@ public class SqlConverter {
 	
 	private String generateSelectFoodCommand(String name) {
 		return "SELECT * FROM " + databaseTable + " WHERE Name = '" + name + "';";
+	}
+	
+	public ArrayList<String> getLikeFoodNames(String keyword) {
+		ArrayList<String> food = new ArrayList<String>();
+		ResultSet resultSet = null;
+		try (Connection connection = DriverManager.getConnection(getConnectionInfo());
+            Statement statement = connection.createStatement();) {
+            resultSet = statement.executeQuery(generateSelectLikeCommand(keyword));
+            while (resultSet.next()) {
+            	food.add(resultSet.getString(1));
+            }
+            return food;
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            return food;
+        }
+	}
+	
+	private String generateSelectLikeCommand(String name) {
+		return "SELECT Name FROM " + databaseTable + " WHERE Name LIKE '%" + name + "%';";
+	}
+	
+	public void printFoodNames(String names) {		
+		ArrayList<String> food = getLikeFoodNames(names);
+		for (int i = 0; i < food.size(); i++) {
+			System.out.println(food.get(i));
+		}
 	}
 }

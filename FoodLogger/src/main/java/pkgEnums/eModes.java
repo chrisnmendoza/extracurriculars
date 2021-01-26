@@ -1,11 +1,14 @@
 package pkgEnums;
 
 public enum eModes {
-	VIEWALL, VIEWONE, INSERT, QUIT, ERROR;
+	VIEWALL, VIEWSOME, VIEWONE, INSERT, QUIT, ERROR;
 	
 	public eModes formatIntoEmode(String s) {
 		if(s.equals("show all")) {
 			return VIEWALL;
+		}
+		else if(s.equals("show some")) {
+			return VIEWSOME;
 		}
 		else if(s.equals("show a food")) {
 			return VIEWONE;

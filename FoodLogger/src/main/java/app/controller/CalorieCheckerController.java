@@ -128,7 +128,7 @@ public class CalorieCheckerController implements Initializable {
 	}
 	
 	private void initializeCommand() {
-		command.getItems().addAll("Insert A Food Item", "Show All Food Names", "Find Nutritional Facts About a Food Item", "Turbo Add");
+		command.getItems().addAll("Insert A Food Item", "Show All Food Names", "Search For Foods", "Find Nutritional Facts About a Food Item", "Turbo Add");
 		command.getSelectionModel().select(command.getItems().get(0));
 		toggleCommands(command.getItems().get(0).toString());
 	}
@@ -150,7 +150,7 @@ public class CalorieCheckerController implements Initializable {
 		    @Override
 		    public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 		    	if(newValue != null) {
-			    	command.getSelectionModel().select(command.getItems().get(2));
+			    	command.getSelectionModel().select(command.getItems().get(3));
 			    	changeMode("Find Nutritional Facts About a Food Item");
 			    	foodName.setText(newValue);
 			    	btnCalcFood(null);
@@ -179,12 +179,15 @@ public class CalorieCheckerController implements Initializable {
 	}
 	
 	private void toggleCommands(String command) {
-		allFoods.setVisible(command.equals("Show All Food Names"));
+		allFoods.setVisible(command.equals("Show All Food Names") || command.equals("Search For Foods"));
 		nutritionalFacts.setVisible(command.equals("Find Nutritional Facts About a Food Item"));
 		if(command.equals("Show All Food Names")) {
-			ArrayList<String> foods = sqlConverter.getAllFoodNames();
+			ArrayList<String> foods = sqlConverter.getLikeFoodNames("");
 			allFoods.getItems().clear();
 			allFoods.getItems().addAll(foods);
+		}
+		else if(command.equals("Search For Foods")) {
+			allFoods.getItems().clear();
 		}
 		else if(command.equals("Find Nutritional Facts About a Food Item")) {
 		}
@@ -216,6 +219,9 @@ public class CalorieCheckerController implements Initializable {
 		}
 		else if(command.equals("Find Nutritional Facts About a Food Item")) {
 			mode = eModes.VIEWONE;
+		}
+		else if(command.equals("Search For Foods")) {
+			mode = eModes.VIEWSOME;
 		}
 		//TODO: add turboaddmode
 		else {
@@ -300,6 +306,11 @@ public class CalorieCheckerController implements Initializable {
 					btnClearFields(null);
 					foodNameOutput.setText(notFound);
 				}
+				break;
+			case VIEWSOME:
+				ArrayList<String> foods = sqlConverter.getLikeFoodNames(foodName.getText());
+				allFoods.getItems().clear();
+				allFoods.getItems().addAll(foods);
 				break;
 			case INSERT:
 				Food foodInsert = new Food(foodName.getText(), Integer.parseInt(calories.getText()), Integer.parseInt(protein.getText()), Integer.parseInt(carbohydrates.getText()), Integer.parseInt(fat.getText()));
