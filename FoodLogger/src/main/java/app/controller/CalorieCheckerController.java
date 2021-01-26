@@ -50,7 +50,7 @@ import javafx.scene.control.DatePicker;
 
 public class CalorieCheckerController implements Initializable {
 	private eModes mode = eModes.INSERT;
-	private CalorieChecker SC = null;
+	private CalorieChecker CC = null;
 
 	@FXML
 	private ComboBox command;
@@ -160,7 +160,7 @@ public class CalorieCheckerController implements Initializable {
 	}
 
 	public void setMainApp1(CalorieChecker sc) {
-		this.SC = sc;
+		this.CC = sc;
 	}
 
 	@FXML
@@ -239,54 +239,45 @@ public class CalorieCheckerController implements Initializable {
 	}
 
 	private boolean ValidateData() {
-		boolean isError = false; //Checks if at least one error is present
 		StringBuilder errors = new StringBuilder();  //StringBuilder for error message
 		Alert err = new Alert(AlertType.ERROR);
 		err.setHeaderText("Incorrectly Entered Data");
-		if(foodName.getText().trim().isEmpty()) {	
-			isError = true;
-			errors.append("Name of Food is required\n");
-		}
+		errors.append(checkIfFieldIsEmpty(foodName));
 		if(mode == eModes.INSERT) {
-			if(calories.getText().trim().isEmpty()) {
-				isError = true;
-				errors.append("Calories is required\n");
-			}
-			else if(Double.parseDouble(calories.getText().trim()) < 0) {
-				isError = true;
-				errors.append("Positive calories is required\n");
-			}
-			if(protein.getText().trim().isEmpty()) {
-				isError = true;
-				errors.append("Protein is required\n");
-			}
-			else if(Double.parseDouble(protein.getText().trim()) < 0) {
-				isError = true;
-				errors.append("Positive protein is required\n");
-			}
-			if(carbohydrates.getText().trim().isEmpty()) {
-				isError = true;
-				errors.append("Carbohydrates is required\n");
-			}
-			else if(Double.parseDouble(carbohydrates.getText().trim()) < 0) {
-				isError = true;
-				errors.append("Positive carbohydrates is required\n");
-			}
-			if(fat.getText().trim().isEmpty()) {
-				isError = true;
-				errors.append("Fat is required\n");
-			}
-			else if(Double.parseDouble(fat.getText().trim()) < 0) {
-				isError = true;
-				errors.append("Positive fat is required\n");
-			}
+			errors.append(validateNutritionInformation(calories));
+			errors.append(validateNutritionInformation(protein));
+			errors.append(validateNutritionInformation(carbohydrates));
+			errors.append(validateNutritionInformation(fat));
 		}
-		if(isError) {
+		if(errors.length() > 0) {
 			err.setContentText(errors.toString());
 			err.showAndWait();
 			return false;
 		}
 		return true;
+	}
+	
+	private String checkIfFieldIsEmpty(TextField textField) {
+		String errorMessage = "";
+		if(textField.getText().trim().isEmpty()) {
+			errorMessage = textField.getId().substring(0,1).toUpperCase() + textField.getId().substring(1) + " is required\n";
+		}
+		return errorMessage;
+	}
+	
+	private String validateNutritionInformation(TextField textField) {
+		String errorMessage = checkIfFieldIsEmpty(textField);
+		if(errorMessage.length() == 0) {
+			try {
+				if(Integer.parseInt(textField.getText().trim()) < 0) {
+					errorMessage = "Positive " + textField.getId().substring(0,1).toUpperCase() + textField.getId().substring(1) + " is required\n";
+				}
+			}
+			catch(NumberFormatException e) {
+				errorMessage = textField.getId().substring(0,1).toUpperCase() + textField.getId().substring(1) + " must be a positive integer\n";
+			}
+		}
+		return errorMessage;
 	}
 
 	@FXML
@@ -305,11 +296,9 @@ public class CalorieCheckerController implements Initializable {
 					fatOutput.setText(food.get(4));
 				}
 				else {
-					foodNameOutput.setText("Food Not Found");
-					caloriesOutput.setText("");
-					proteinOutput.setText("");
-					carbohydratesOutput.setText("");
-					fatOutput.setText("");
+					String notFound = foodName.getText() + " Is Not Found";
+					btnClearFields(null);
+					foodNameOutput.setText(notFound);
 				}
 				break;
 			case INSERT:
