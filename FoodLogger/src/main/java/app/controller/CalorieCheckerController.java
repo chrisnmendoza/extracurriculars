@@ -16,8 +16,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import pkgLogic.Food;
-import pkgLogic.Loan;
-import pkgLogic.Payment;
 import pkgLogic.ServerInfo;
 import pkgLogic.SqlConverter;
 import pkgEnums.eModes;

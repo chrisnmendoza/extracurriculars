@@ -63,7 +63,6 @@ public class SqlConverter {
             prepsInsertProduct.execute();
             resultSet = prepsInsertProduct.getGeneratedKeys();
             while (resultSet.next()) {
-                //System.out.println("Generated: " + resultSet.getString(1));
             }
         }
         catch (SQLException e) {
@@ -92,10 +91,7 @@ public class SqlConverter {
 	            while (resultSet.next()) {
 	            	for(int i = 1; i <= metaData.getColumnCount(); i++) {
 	            		food.add(resultSet.getString(i));
-	            		//System.out.print(resultSet.getString(i));
-	            		//System.out.print(" ");
 	            	}
-	            	//System.out.println();
 	            }
         	}
         	return food;
@@ -118,12 +114,4 @@ public class SqlConverter {
 	private String generateSelectFoodCommand(String name) {
 		return "SELECT * FROM " + databaseTable + " WHERE Name = '" + name + "';";
 	}
-	
-	/*
-	 * I want to make a calorie checker and tracker
-	 * User input should be able to:
-	 * - add in new foods (maybe disable this for guest mode) INSERT INTO
-	 * - pull foods in database already given name SELECT * FROM Person WHERE Name = 'B';
-	 * - pull entire list of foods SELECT Name FROM 
-	 */
 }
