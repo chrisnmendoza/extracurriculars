@@ -49,7 +49,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 
 public class CalorieCheckerController implements Initializable {
-	private eModes mode = null;
+	private eModes mode = eModes.INSERT;
 	private CalorieChecker SC = null;
 
 	@FXML
@@ -118,40 +118,45 @@ public class CalorieCheckerController implements Initializable {
 	private ServerInfo server = new ServerInfo(ip, "49172", "testDatabase", username, password);
 	private SqlConverter sqlConverter = new SqlConverter(database, table, columns, server);
 	
-	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		foodNameOutput.setText("");
-		caloriesOutput.setText("");
-		proteinOutput.setText("");
-		carbohydratesOutput.setText("");
-		fatOutput.setText("");
 		insertSuccess.setVisible(false);
-		String table = "dbo.Food";
-        String database = "testDatabase";
-        String columns = "(Name, Calories, [Protein (g)], [Carbohydrates (g)], [Fat (g)])";
-        ServerInfo server = new ServerInfo("192.168.1.46", "49172", "testDatabase", "chrisnmendoza", "Chiopet1");
-        SqlConverter sqlConverter = new SqlConverter(database, table, columns, server);
-        ArrayList<String> foods = sqlConverter.getAllFoodNames();
-
+		btnClearFields(null);
+        initializeCommand();
+		addListenerToCommand();
+		addListenerToAllFoods();
+	}
+	
+	private void initializeCommand() {
 		command.getItems().addAll("Insert A Food Item", "Show All Food Names", "Find Nutritional Facts About a Food Item", "Turbo Add");
-
 		command.getSelectionModel().select(command.getItems().get(0));
 		toggleCommands(command.getItems().get(0).toString());
-		mode = eModes.INSERT;
-
+	}
+	
+	private void addListenerToCommand() {
 		command.valueProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue ov, String t, String t1) {
 				toggleLabelsAndTextFields(t1);
 				toggleCommands(t1);
-				btnClearResults(null);
+				btnClearFields(null);
 				changeMode(t1);
 			}
 		});
-		
-		allFoods.getItems().addAll(foods);
-		// PaintChart();
+	}
+	
+	private void addListenerToAllFoods() {
+		allFoods.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+		    @Override
+		    public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+		    	if(newValue != null) {
+			    	command.getSelectionModel().select(command.getItems().get(2));
+			    	changeMode("Find Nutritional Facts About a Food Item");
+			    	foodName.setText(newValue);
+			    	btnCalcFood(null);
+		    	}
+		    }
+		});
 	}
 
 	public void setMainApp1(CalorieChecker sc) {
@@ -160,17 +165,17 @@ public class CalorieCheckerController implements Initializable {
 
 	@FXML
 	private void btnClearFields(ActionEvent event) {
-
 		btnClearResults(event);
 		foodName.clear();
 		calories.clear();
 		protein.clear();
 		carbohydrates.clear();
 		fat.clear();
-	}
-
-	private void toggleEscrow(String strLoanType) {
-		carbohydrates.setVisible((strLoanType == "Home"));
+		foodNameOutput.setText("");
+		caloriesOutput.setText("");
+		proteinOutput.setText("");
+		carbohydratesOutput.setText("");
+		fatOutput.setText("");
 	}
 	
 	private void toggleCommands(String command) {
@@ -184,7 +189,6 @@ public class CalorieCheckerController implements Initializable {
 		else if(command.equals("Find Nutritional Facts About a Food Item")) {
 		}
 		else if(command.equals("Insert A Food Item")) {
-			
 		}
 	}
 	
@@ -235,21 +239,15 @@ public class CalorieCheckerController implements Initializable {
 	}
 
 	private boolean ValidateData() {
-		
 		boolean isError = false; //Checks if at least one error is present
 		StringBuilder errors = new StringBuilder();  //StringBuilder for error message
 		Alert err = new Alert(AlertType.ERROR);
 		err.setHeaderText("Incorrectly Entered Data");
-		
-		//foodName Validations
 		if(foodName.getText().trim().isEmpty()) {	
 			isError = true;
 			errors.append("Name of Food is required\n");
 		}
-		
 		if(mode == eModes.INSERT) {
-		
-			//calories Validations
 			if(calories.getText().trim().isEmpty()) {
 				isError = true;
 				errors.append("Calories is required\n");
@@ -258,8 +256,6 @@ public class CalorieCheckerController implements Initializable {
 				isError = true;
 				errors.append("Positive calories is required\n");
 			}
-			
-			//protein Validations
 			if(protein.getText().trim().isEmpty()) {
 				isError = true;
 				errors.append("Protein is required\n");
@@ -268,8 +264,6 @@ public class CalorieCheckerController implements Initializable {
 				isError = true;
 				errors.append("Positive protein is required\n");
 			}
-			
-			//carbohydrates Validation
 			if(carbohydrates.getText().trim().isEmpty()) {
 				isError = true;
 				errors.append("Carbohydrates is required\n");
@@ -278,8 +272,6 @@ public class CalorieCheckerController implements Initializable {
 				isError = true;
 				errors.append("Positive carbohydrates is required\n");
 			}
-			
-			//fat Validation
 			if(fat.getText().trim().isEmpty()) {
 				isError = true;
 				errors.append("Fat is required\n");
@@ -289,25 +281,19 @@ public class CalorieCheckerController implements Initializable {
 				errors.append("Positive fat is required\n");
 			}
 		}
-		
 		if(isError) {
 			err.setContentText(errors.toString());
 			err.showAndWait();
 			return false;
 		}
-
 		return true;
 	}
 
 	@FXML
-	private void btnCalcLoan(ActionEvent event) {
-
+	private void btnCalcFood(ActionEvent event) {
 		btnClearResults(event);
-
-		// Validate the data. If the method returns 'false', exit the method
 		if (ValidateData() == false)
 			return;
-		
 		switch(mode) {
 			case VIEWONE:
 				ArrayList<String> food = sqlConverter.getFoodByName(foodName.getText());
@@ -332,7 +318,6 @@ public class CalorieCheckerController implements Initializable {
 				insertSuccess.setVisible(true);
 				btnClearFields(null);
 				break;
-				
 			//TODO add turboadder
 			case ERROR:
 				System.out.println("error in combobox selection");
