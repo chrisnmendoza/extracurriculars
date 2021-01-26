@@ -1,9 +1,6 @@
 package app.controller;
 
 import app.CalorieChecker;
-import app.Food;
-import app.ServerInfo;
-import app.SqlConverter;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -18,8 +15,11 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import pkgLogic.Food;
 import pkgLogic.Loan;
 import pkgLogic.Payment;
+import pkgLogic.ServerInfo;
+import pkgLogic.SqlConverter;
 import pkgEnums.eModes;
 
 import java.net.URL;

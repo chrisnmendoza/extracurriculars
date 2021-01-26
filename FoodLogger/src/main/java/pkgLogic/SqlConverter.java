@@ -1,4 +1,4 @@
-package app;
+package pkgLogic;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

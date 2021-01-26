@@ -1,4 +1,4 @@
-package app;
+package pkgLogic;
 
 public class ServerInfo {
 	private String ip;
